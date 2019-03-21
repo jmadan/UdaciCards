@@ -1,0 +1,1 @@
+This is the starter code for the final assessment project for Udacity's React Native course. This project was bootstrapped with Create React App.
