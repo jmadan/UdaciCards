@@ -1,6 +1,6 @@
-import { FetchDecks } from '../utils/storage'
+import { getDecks, ClearAll } from '../utils/storage'
 
-export const NewDeck = deck => dispatch => {
+export const NewDeckAction = deck => dispatch => {
     dispatch({
         type: 'NEW_DECK',
         payload: deck
@@ -8,11 +8,21 @@ export const NewDeck = deck => dispatch => {
 }
 
 export const FetchDecksAction = () => dispatch => {
-    FetchDecks().then(result => {
-        const response = JSON.parse(result)
+    getDecks().then(result => {
         dispatch({
             type: 'FETCH_DECKS',
-            payload: response.decks.map(d => d)
+            payload: result
         })
     })
+}
+
+export const ClearDecksAction = () => dispatch => {
+    ClearAll()
+    // .then(result => {
+        // const response = JSON.parse(result)
+        dispatch({
+            type: 'CLEAR_DECKS',
+            payload: null
+        })
+    // })
 }

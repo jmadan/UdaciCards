@@ -3,9 +3,9 @@ import { Container, Header, Content, Body, Title, Text, Form, Item, Input, Butto
 // import { View, Text, TextInput, Alert, StyleSheet, Button } from 'react-native';
 import { connect } from 'react-redux'
 // import TextButton from '../button/TextButton'
-import { NewDeck } from '../../actions/DeckActions';
+import { NewDeckAction } from '../../actions/DeckActions';
 import * as ShortId from 'shortid'
-import { CreateDeck } from '../../utils/storage'
+import { saveDeckTitle } from '../../utils/storage'
 
 
 // const styles = StyleSheet.create({
@@ -28,26 +28,28 @@ import { CreateDeck } from '../../utils/storage'
 //     }
 // })
 
-class AddDeck extends Component {
+class NewDeck extends Component {
     state = {
         title: ''
     }
 
     onValueChange(value) {
-        console.log(value)
         this.setState({
           title: value
         });
       }
 
     onSubmit = () => {
-        const { deckList } = this.props
-        const ifExists = deckList.decks && deckList.decks.find(d => d.title === this.state.title)
+        const { decks } = this.props
+
+        const ifExists = decks && Object.keys(decks).findIndex(k => deck[k].title === this.state.title)
+        console.log(ifExists)
         if(!ifExists){
-            console.log('I am in')
+
             const deckId = ShortId.generate();
-            this.props.dispatch(NewDeck({id: deckId, title: this.state.title}))
-            CreateDeck({id: deckId, title: this.state.title})
+            this.props.dispatch(NewDeckAction({id: deckId, title: this.state.title}))
+            saveDeckTitle({id: deckId, title: this.state.title})
+            Toast.show({text: 'Deck saved!'})
         } else {
             this.showToast('Deck with this title already exists!')
         }
@@ -63,12 +65,14 @@ class AddDeck extends Component {
 
     render(){
         const { title } = this.state
+        const { decks } = this.props
+        console.log('New Deck render: ', decks)
         return (
             <Container>
                 <Header>
                     <Body>
                         <Title>
-                            Create a New Deck
+                            What is the title of your new deck?
                         </Title>
                     </Body>
                 </Header>
@@ -76,13 +80,13 @@ class AddDeck extends Component {
                     <Form>
                         <Item padder>
                             <Input
-                                placeholder="Deck title"
+                                placeholder="Deck Title"
                                 onChangeText={this.onValueChange.bind(this)}
                                 value={title}
                                 />
                         </Item>
                     </Form>
-                    <Button disabled={title ? true : false} block style={{ margin: 15, marginTop: 50 }} onPress={() => {this.onSubmit()}}>
+                    <Button disabled={title ? false : true} block style={{ margin: 15, marginTop: 50 }} onPress={() => {this.onSubmit()}}>
                         <Text>Submit</Text>
                     </Button>
                 </Content>
@@ -93,8 +97,8 @@ class AddDeck extends Component {
 
 const mapStateToProps = (store) => {
     return {
-        deckList: store.decks
+        decks: store.decks
     }
 }
 
-export default connect(mapStateToProps)(AddDeck)
+export default connect(mapStateToProps)(NewDeck)

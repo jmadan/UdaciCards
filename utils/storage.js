@@ -1,47 +1,80 @@
 import { AsyncStorage } from 'react-native';
 
-const KEY = '@Udacity:UdaciCard';
-
-export const FetchDecks = async () => {
+export const getDecks = async () => {
     try{
-        const value = await AsyncStorage.getItem(KEY);
-        if (value !== null) {
-          return value;
-        } else {
-            console.log('I am null while fetching')
-        }
+        const decks = {}
+        // const value = await AsyncStorage.getItem(KEY);
+        // if (value !== null) {
+        //     console.log(JSON.parse(value))
+        //   return value;
+        // } else {
+        //     console.log('I am null while fetching')
+        //     return null
+        // }
+        const keys = await AsyncStorage.getAllKeys()
+        const result = await AsyncStorage.multiGet(keys)
+        result.map((result, i, store) => {
+            // get at each store's key/value so you can work with it
+            let key = store[i][0];
+            let value = store[i][1];
+            decks[key] = JSON.parse(value)
+          });
+          console.log('finaldecks -------- ',decks)
+        return decks
     } catch (error) {
     // Error retrieving data
     }
 }
 
-export const CreateDeck = async (entry) => {
+export const getDeck = async (id) => {
+    try{
+        const deck = await AsyncStorage.getItem(id);
+        if (deck !== null) {
+          return deck;
+        } else {
+            console.log('I am null while fetching')
+            return null
+        }
+        return deck
+    } catch (error) {
+        console.log(error)
+        return error
+    }
+}
+
+export const saveDeckTitle = async (entry) => {
     console.log(entry)
     try{
-        const value = await AsyncStorage.getItem(KEY);
-        if (value !== null) {
-            value.push(entry)
-            await AsyncStorage.setItem(KEY, JSON.stringify({decks: value}))
-            console.log('after storage',value);
-        } else {
-            let valueArray = [];
-            valueArray.push(entry);
-            let result = await AsyncStorage.setItem(KEY, JSON.stringify({decks: valueArray}))
-            console.log('result after first save: ', result)
-        }
+        await AsyncStorage.setItem(entry.id, JSON.stringify(entry))
     } catch (error) {
         return error;
     }
 }
 
-export const CreateCard = async (entry) => {
+export const saveCardToDeck = async (entry) => {
+    const { cards, deckId } = entry
     try{
-        const value = await AsyncStorage.getItem(KEY);
+        const value = await AsyncStorage.getItem(deckId);
         if (value !== null) {
-          // We have data!!
-          console.log(value);
+            let deck = JSON.parse(value)
+            if(deck.cards){
+                deck.cards = Object.assign({}, deck.cards, {[cards.id]: cards})
+            } else {
+                deck.cards = {[cards.id]: cards}
+            }
+            await AsyncStorage.mergeItem(deckId, JSON.stringify(deck))
         }
     } catch (error) {
+        console.log(error)
     // Error retrieving data
+    }
+}
+
+export const ClearAll = async () => {
+    try{
+        console.log('I am cleaning....')
+        await AsyncStorage.clear(err => console.log(err));
+    } catch (error) {
+        console.log(error)
     }
 }
