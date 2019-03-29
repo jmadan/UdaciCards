@@ -11,9 +11,21 @@ class DeckDetail extends Component {
 
     componentDidMount(){
         const { navigation, decks } = this.props
-        const deckId = navigation.getParam('deckId', 'NO-ID')
-        const deck = decks[deckId]
+        const deckTitle = navigation.getParam('deckTitle', 'NO-ID')
+        const deck = decks[deckTitle]
         this.updateState(deck)
+    }
+
+    componentDidUpdate(prevProps){
+        const { decks } = this.props
+        const { deck } = this.state
+        const prevDeck = prevProps.decks[deck.title]
+        if(!('questions' in prevDeck) && decks[deck.title].questions){
+            this.updateState(decks[deck.title])
+        }
+        if(('questions' in prevDeck) && Object.keys(prevDeck.questions).length !== Object.keys(decks[deck.title].questions).length){
+            this.updateState(decks[deck.title])
+        }
     }
 
     updateState(deck){
@@ -23,25 +35,22 @@ class DeckDetail extends Component {
     }
     render(){
         const { deck } = this.state
-        const selectedDeck = deck
         
-        const ele = selectedDeck ? 
+        const ele = deck ? 
             <Container>
                 <Card bordered >
-                    <CardItem header bordered>
-                        <Text>{selectedDeck.title}</Text>
+                    <CardItem header style={{justifyContent: 'center'}}>
+                        <Text>{deck.title}</Text>
                     </CardItem>
-                    <CardItem>
-                        <Body>
-                            <Text>{selectedDeck.cards ? Object.keys(selectedDeck.cards).length : 0 } Cards</Text>
-                        </Body>
+                    <CardItem style={{justifyContent: 'center'}}>
+                        <Text>{deck.questions ? Object.keys(deck.questions).length : 0 } Cards</Text>
                     </CardItem>
                     <CardItem>
                         <Body>
                             <Button
                                 block
                                 primary
-                                onPress={() => this.props.navigation.navigate('NewCard', { deckId: selectedDeck.id })}
+                                onPress={() => this.props.navigation.navigate('NewCard', { deckTitle: deck.title })}
                             >
                                 <Text>Add Card</Text>
                             </Button>
@@ -52,7 +61,8 @@ class DeckDetail extends Component {
                             <Button
                                 block
                                 success
-                                onPress={() => this.props.navigation.navigate('Quiz', { deckId: selectedDeck.id })}
+                                disabled={deck.questions && Object.keys(deck.questions).length ? false : true}
+                                onPress={() => this.props.navigation.navigate('Quiz', { deckTitle: deck.title })}
                             >
                                 <Text>Start Quiz</Text>
                             </Button>

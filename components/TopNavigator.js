@@ -12,14 +12,14 @@ const DeckStack = createStackNavigator({
   Decks: {
     screen: Deck,
     navigationOptions: {
-      title: 'FlashCards'
+      title: 'udacicards'
     }
   },
   DeckDetail: {
     screen: DeckDetail,
-    navigationOptions: {
-      title: 'Deck View'
-    }
+    // navigationOptions: {
+    //   title: 'Deck View'
+    // }
   },
   NewCard: {
     screen: NewCard,

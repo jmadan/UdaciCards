@@ -5,17 +5,18 @@ const initialState = {
 export default (state = initialState, action) => {
     switch(action.type) {
         case 'NEW_DECK':
-            return Object.assign({}, state, {[action.payload.id]: action.payload})
+            return Object.assign({}, state, {[action.payload.title]: action.payload})
         case 'FETCH_DECKS':
             // const deckObj = action.payload
             if(Object.keys(action.payload).length){
                 return action.payload    
             }
             return null
-        case 'ADD_CARD':
-            const { deck, question, answer, cardId } = action.payload
-            const newCard = {question, answer}
-            return {...state, [deck.id]: {...state[deck.id], cards: {...state[deck.id].cards, cardId: newCard}}}
+        case 'NEW_CARD':
+            const { deck, card } = action.payload
+            const newCard = {id: card.id, question: card.question, answer: card.answer}
+            const { question } = card
+            return {...state, [deck.title]: {...state[deck.title], questions: {...state[deck.title].questions, [question]: newCard}}}
         case 'CLEAR_DECKS':
             return Object.assign({}, {decks: null})
         default:

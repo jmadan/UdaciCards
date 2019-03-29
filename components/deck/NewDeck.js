@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Container, Header, Content, Body, Title, Text, Form, Item, Input, Button, Toast } from 'native-base'
-// import { View, Text, TextInput, Alert, StyleSheet, Button } from 'react-native';
+import { Keyboard } from 'react-native';
 import { connect } from 'react-redux'
 // import TextButton from '../button/TextButton'
 import { NewDeckAction } from '../../actions/DeckActions';
@@ -42,14 +42,15 @@ class NewDeck extends Component {
     onSubmit = () => {
         const { decks } = this.props
 
-        const ifExists = decks && Object.keys(decks).findIndex(k => deck[k].title === this.state.title)
-        console.log(ifExists)
-        if(!ifExists){
-
+        const ifExists = decks && Object.keys(decks).findIndex(k => decks[k].title === this.state.title)
+        if(ifExists === -1 || !ifExists){
+            Keyboard.dismiss()
             const deckId = ShortId.generate();
             this.props.dispatch(NewDeckAction({id: deckId, title: this.state.title}))
             saveDeckTitle({id: deckId, title: this.state.title})
-            Toast.show({text: 'Deck saved!'})
+            Toast.show({text: 'Deck saved!', type: 'success'})
+            this.setState({title: ''})
+            this.props.navigation.navigate('Decks')
         } else {
             this.showToast('Deck with this title already exists!')
         }
@@ -65,8 +66,6 @@ class NewDeck extends Component {
 
     render(){
         const { title } = this.state
-        const { decks } = this.props
-        console.log('New Deck render: ', decks)
         return (
             <Container>
                 <Header>

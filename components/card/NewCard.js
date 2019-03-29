@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Keyboard } from 'react-native'
 import { Container, Header, Content, Body, Title, Text, Form, Item, Input, Button, Toast } from 'native-base'
 import { connect } from 'react-redux'
 import * as ShortId from 'shortid'
@@ -14,9 +15,9 @@ class NewCard extends Component {
 
     componentDidMount(){
         const { navigation } = this.props
-        const deckId = navigation.getParam('deckId', 'NO-ID')
-        if(deckId && deckId !== 'NO-ID'){
-            const deck = this.props.decks[deckId]
+        const deckTitle = navigation.getParam('deckTitle', 'NO-ID')
+        if(deckTitle && deckTitle !== 'NO-ID'){
+            const deck = this.props.decks[deckTitle]
             this.updateDeck(deck)
         } else {
             Toast.show('Oops! Something went wrong. Please try again...')
@@ -32,10 +33,10 @@ class NewCard extends Component {
     onSubmit = () => {
         const { question, answer, deck } = this.state
         const cardId = ShortId.generate();
-        
-        this.props.dispatch(NewCardAction(deck.id, {[cardId]: {id: cardId, question: question, answer: answer}}))
-        saveCardToDeck({deckId: deck.id, cards: {id: cardId, question: question, answer: answer}})
-        Toast.show({text: 'Card saved!'})
+        Keyboard.dismiss()
+        this.props.dispatch(NewCardAction(deck, {id: cardId, question: question, answer: answer}))
+        saveCardToDeck({deckTitle: deck.title, card: {id: cardId, question: question, answer: answer}})
+        Toast.show({text: 'Card saved!', type: 'success'})
         this.props.navigation.navigate('DeckDetail')
     }
 
@@ -47,16 +48,9 @@ class NewCard extends Component {
     }
 
     render(){
-        const { question, answer } = this.state
+        const { question, answer, deck } = this.state
         return (
             <Container>
-                <Header>
-                    <Body>
-                        <Title>
-                            Add Card
-                        </Title>
-                    </Body>
-                </Header>
                 <Content padder>
                     <Form>
                         <Item padder>

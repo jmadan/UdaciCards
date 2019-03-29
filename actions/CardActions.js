@@ -1,9 +1,8 @@
 import { FetchDecks, ClearAll } from '../utils/storage'
 
-export const NewCardAction = (deckId, card) => dispatch => {
-    console.log(deckId, card)
+export const NewCardAction = (deck, card) => dispatch => {
     dispatch({
         type: 'NEW_CARD',
-        payload: {deckId, card}
+        payload: {deck, card}
     })
 }
