@@ -1,41 +1,40 @@
 import { AsyncStorage } from 'react-native';
 
 export const getDecks = async () => {
-    try{
-        const decks = {}
-        const keys = await AsyncStorage.getAllKeys()
-        const result = await AsyncStorage.multiGet(keys)
-        result.map((result, i, store) => {
-            // get at each store's key/value so you can work with it
-            let key = store[i][0];
-            let value = store[i][1];
-            decks[key] = JSON.parse(value)
-          });
-        return decks
-    } catch (error) {
-    // Error retrieving data
+    try {
+        const result = await AsyncStorage.getItem("decks")
+        return await JSON.parse(result) || {}
+    }
+    catch(err){
+        console.log(err)
     }
 }
 
 export const getDeck = async (title) => {
     try{
-        const deck = await AsyncStorage.getItem(title);
-        if (deck !== null) {
-          return deck;
-        } else {
-            console.log('I am null while fetching')
-            return null
-        }
-        return deck
+        const decks = await getDecks()
+        return decks[title]
     } catch (error) {
         console.log(error)
         return error
     }
 }
 
+export const deleteDeck = async (entryId) => {
+    try{
+        await AsyncStorage.removeItem(entryId)
+    } catch (error) {
+        return error;
+    }
+}
+
 export const saveDeckTitle = async (entry) => {
     try{
-        await AsyncStorage.setItem(entry.title, JSON.stringify(entry))
+        const decks = await getDecks() || {}
+        const { title } = entry
+        decks[title] = Object.assign({}, entry)
+        await AsyncStorage.setItem("decks", JSON.stringify(decks))
+        return decks
     } catch (error) {
         return error;
     }
@@ -43,17 +42,15 @@ export const saveDeckTitle = async (entry) => {
 
 export const saveCardToDeck = async (entry) => {
     const { card, deckTitle } = entry
+    const decks = await getDecks()
+    if(decks[deckTitle].questions){
+        decks[deckTitle].questions = [...decks[deckTitle].questions, card]
+    } else {
+        decks[deckTitle] = {...decks[deckTitle], questions: [].concat(card)}
+    }
     try{
-        const value = await AsyncStorage.getItem(deckTitle);
-        if (value !== null) {
-            let deck = JSON.parse(value)
-            if(deck.questions){
-                deck.questions = Object.assign({}, deck.questions, {[card.question]: card})
-            } else {
-                deck.questions = {[card.question]: card}
-            }
-            await AsyncStorage.mergeItem(deckTitle, JSON.stringify(deck))
-        }
+        await AsyncStorage.setItem("decks", JSON.stringify(decks))
+        return decks
     } catch (error) {
         console.log(error)
     // Error retrieving data

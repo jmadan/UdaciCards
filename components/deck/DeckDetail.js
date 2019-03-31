@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import { Container, Content, Text, Card, CardItem, Button, Body } from 'native-base'
 import { connect } from 'react-redux'
+import DeckActions from '../../actions/DeckActions'
 import Spinner from '../Spinner'
+import DeckDetailsView from './DeckDetailsView'
 
 class DeckDetail extends Component {
 
@@ -16,16 +18,12 @@ class DeckDetail extends Component {
         this.updateState(deck)
     }
 
-    componentDidUpdate(prevProps){
-        const { decks } = this.props
-        const { deck } = this.state
-        const prevDeck = prevProps.decks[deck.title]
-        if(!('questions' in prevDeck) && decks[deck.title].questions){
-            this.updateState(decks[deck.title])
-        }
-        if(('questions' in prevDeck) && Object.keys(prevDeck.questions).length !== Object.keys(decks[deck.title].questions).length){
-            this.updateState(decks[deck.title])
-        }
+    componentWillReceiveProps(nextProps) {
+        const { navigation } = this.props
+        const { decks } = nextProps
+        const deckTitle = navigation.getParam('deckTitle', 'NO-ID')
+        const deck = decks[deckTitle]
+        this.updateState(deck)
     }
 
     updateState(deck){
@@ -39,12 +37,7 @@ class DeckDetail extends Component {
         const ele = deck ? 
             <Container>
                 <Card bordered >
-                    <CardItem header style={{justifyContent: 'center'}}>
-                        <Text>{deck.title}</Text>
-                    </CardItem>
-                    <CardItem style={{justifyContent: 'center'}}>
-                        <Text>{deck.questions ? Object.keys(deck.questions).length : 0 } Cards</Text>
-                    </CardItem>
+                    <DeckDetailsView questions={deck.questions} title={deck.title} />
                     <CardItem>
                         <Body>
                             <Button
@@ -61,7 +54,7 @@ class DeckDetail extends Component {
                             <Button
                                 block
                                 success
-                                disabled={deck.questions && Object.keys(deck.questions).length ? false : true}
+                                disabled={deck.questions && deck.questions.length ? false : true}
                                 onPress={() => this.props.navigation.navigate('Quiz', { deckTitle: deck.title })}
                             >
                                 <Text>Start Quiz</Text>

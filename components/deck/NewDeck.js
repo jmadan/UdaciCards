@@ -2,31 +2,8 @@ import React, { Component } from 'react'
 import { Container, Header, Content, Body, Title, Text, Form, Item, Input, Button, Toast } from 'native-base'
 import { Keyboard } from 'react-native';
 import { connect } from 'react-redux'
-// import TextButton from '../button/TextButton'
 import { NewDeckAction } from '../../actions/DeckActions';
 import * as ShortId from 'shortid'
-import { saveDeckTitle } from '../../utils/storage'
-
-
-// const styles = StyleSheet.create({
-//     conatiner: {
-//         padding: 2,
-//         borderRadius: 4,
-//         borderWidth: 0.5,
-//         borderColor: '#d6d7da',
-//         justifyContent: 'center',
-//     },
-//     title: {
-//         fontSize: 19,
-//         fontWeight: 'bold',
-//       },
-//     button: {
-//         color: '#841584'
-//     },
-//     inputStyle: {
-
-//     }
-// })
 
 class NewDeck extends Component {
     state = {
@@ -42,15 +19,14 @@ class NewDeck extends Component {
     onSubmit = () => {
         const { decks } = this.props
 
-        const ifExists = decks && Object.keys(decks).findIndex(k => decks[k].title === this.state.title)
+        const ifExists = decks && Object.keys(decks).findIndex(k => k === this.state.title)
         if(ifExists === -1 || !ifExists){
             Keyboard.dismiss()
             const deckId = ShortId.generate();
             this.props.dispatch(NewDeckAction({id: deckId, title: this.state.title}))
-            saveDeckTitle({id: deckId, title: this.state.title})
             Toast.show({text: 'Deck saved!', type: 'success'})
             this.setState({title: ''})
-            this.props.navigation.navigate('Decks')
+            this.props.navigation.navigate('DeckDetail',{deckTitle: this.state.title})
         } else {
             this.showToast('Deck with this title already exists!')
         }

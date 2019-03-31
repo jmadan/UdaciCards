@@ -5,9 +5,12 @@ import { Provider } from 'react-redux'
 import Tabs from './components/TopNavigator'
 import Store from './store'
 import { Constants } from 'expo'
-
-
+import { setLocalNotification, clearNotification } from './utils/notification'
 export default class App extends React.Component {
+
+  componentDidMount(){
+    setLocalNotification()
+  }
   render() {
     return (
       <Provider store={Store}>

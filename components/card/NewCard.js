@@ -35,9 +35,15 @@ class NewCard extends Component {
         const cardId = ShortId.generate();
         Keyboard.dismiss()
         this.props.dispatch(NewCardAction(deck, {id: cardId, question: question, answer: answer}))
-        saveCardToDeck({deckTitle: deck.title, card: {id: cardId, question: question, answer: answer}})
+        // saveCardToDeck({deckTitle: deck.title, card: {id: cardId, question: question, answer: answer}})
         Toast.show({text: 'Card saved!', type: 'success'})
         this.props.navigation.navigate('DeckDetail')
+    }
+
+    handleChange(key, value) {
+        this.setState({
+            [key]: value
+        })
     }
 
     showToast = (msg) => {
@@ -57,7 +63,7 @@ class NewCard extends Component {
                             <Input
                                 name="quest"
                                 placeholder="Question..."
-                                onChangeText={(value)=> this.setState({question: value})}
+                                onChangeText={(value)=> this.handleChange('question', value)}
                                 value={question}
                                 />
                         </Item>
@@ -65,7 +71,7 @@ class NewCard extends Component {
                             <Input
                                 name="ans"
                                 placeholder="Answer..."
-                                onChangeText={(value)=> this.setState({answer: value})}
+                                onChangeText={(value)=> this.handleChange('answer', value)}
                                 value={answer}
                                 />
                         </Item>
