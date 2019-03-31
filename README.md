@@ -26,5 +26,5 @@ The project uses the following dependencies:
 * shortid
 * react-navigation
 
-## Credits
-Flipcard animations : https://codedaily.io/screencasts/12/Create-a-Flip-Card-Animation-with-React-Native
+## Testing
+* Tested on Iphone 7 plus
